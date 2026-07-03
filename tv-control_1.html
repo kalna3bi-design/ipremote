@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0e13">
+<title>التحكم — Sony · Xiaomi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0e13;
+  --panel:#131822;
+  --panel-2:#0f141d;
+  --line:#222a38;
+  --text:#eaf0f7;
+  --muted:#7c8798;
+  --ok:#3ddc84;
+  --err:#ff5c5c;
+  --accent:#2f8bff;          /* Sony */
+  --accent-soft:rgba(47,139,255,.16);
+  --accent-glow:rgba(47,139,255,.35);
+}
+body[data-device="xiaomi"]{
+  --accent:#ff6a1a;          /* Xiaomi */
+  --accent-soft:rgba(255,106,26,.16);
+  --accent-glow:rgba(255,106,26,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:radial-gradient(1200px 700px at 50% -10%, #121a28 0%, var(--bg) 55%);
+  color:var(--text);
+  font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100dvh;
+  padding:max(14px, env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom));
+  user-select:none;
+  transition:background .4s;
+}
+.remote{width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px}
+
+/* ---------- header / device switch ---------- */
+header{display:flex;align-items:center;gap:10px}
+.brand{font-weight:700;font-size:15px;letter-spacing:.02em}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
+.spacer{flex:1}
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);font-size:18px;cursor:pointer;
+  display:grid;place-items:center;transition:.15s;
+}
+.icon-btn:active{transform:scale(.92)}
+.tabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:16px;
+}
+.tab{
+  border:none;border-radius:11px;padding:11px 0;cursor:pointer;
+  background:transparent;color:var(--muted);
+  font:inherit;font-weight:600;font-size:14px;transition:.2s;
+}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 6px 20px var(--accent-glow)}
+
+/* ---------- panels ---------- */
+.card{
+  background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
+  border:1px solid var(--line);border-radius:22px;padding:16px;
+}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+
+button.key{
+  font:inherit;color:var(--text);cursor:pointer;
+  background:#1a2130;border:1px solid #273044;border-radius:14px;
+  padding:13px 6px;font-size:14px;font-weight:600;
+  transition:transform .08s, background .15s, border-color .15s;
+}
+button.key:active{transform:scale(.93);background:var(--accent-soft);border-color:var(--accent)}
+button.key.small{font-size:12.5px;padding:11px 4px;font-weight:500}
+button.key .glyph{display:block;font-size:18px;margin-bottom:3px}
+
+.power{
+  width:64px;height:64px;border-radius:50%;margin-inline:auto;
+  background:#1a2130;border:1px solid #33240f00;
+  border:1px solid #3a1c1c;color:var(--err);font-size:24px;cursor:pointer;
+  display:grid;place-items:center;transition:.15s;
+  box-shadow:inset 0 0 0 1px rgba(255,92,92,.15);
+}
+.power:active{transform:scale(.9);background:rgba(255,92,92,.15)}
+
+/* ---------- D-pad (signature) ---------- */
+.dpad-wrap{display:flex;justify-content:center;padding:6px 0}
+.dpad{
+  position:relative;width:216px;height:216px;border-radius:50%;
+  background:conic-gradient(from 180deg, #161d2a, #1c2434, #161d2a, #1c2434, #161d2a);
+  border:1px solid #273044;
+  box-shadow:0 0 0 6px var(--panel-2), 0 0 60px -18px var(--accent-glow);
+  transition:box-shadow .4s;
+}
+.dir{
+  position:absolute;width:64px;height:64px;border:none;background:transparent;
+  color:var(--text);font-size:20px;cursor:pointer;border-radius:16px;transition:.12s;
+}
+.dir:active{color:var(--accent);transform:scale(.85)}
+.dir.up{top:6px;left:50%;transform:translateX(-50%)}
+.dir.up:active{transform:translateX(-50%) scale(.85)}
+.dir.down{bottom:6px;left:50%;transform:translateX(-50%)}
+.dir.down:active{transform:translateX(-50%) scale(.85)}
+.dir.left{left:6px;top:50%;transform:translateY(-50%)}
+.dir.left:active{transform:translateY(-50%) scale(.85)}
+.dir.right{right:6px;top:50%;transform:translateY(-50%)}
+.dir.right:active{transform:translateY(-50%) scale(.85)}
+.okbtn{
+  position:absolute;inset:0;margin:auto;width:88px;height:88px;border-radius:50%;
+  background:var(--accent);border:none;color:#fff;font:inherit;font-weight:700;font-size:16px;
+  cursor:pointer;box-shadow:0 10px 30px var(--accent-glow);transition:.15s;
+}
+.okbtn:active{transform:scale(.9)}
+
+/* ---------- rockers ---------- */
+.rockers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.rocker{
+  display:flex;flex-direction:column;align-items:stretch;gap:0;
+  background:#1a2130;border:1px solid #273044;border-radius:18px;overflow:hidden;
+}
+.rocker button{
+  border:none;background:transparent;color:var(--text);font:inherit;
+  padding:14px 0;font-size:17px;cursor:pointer;transition:.12s;
+}
+.rocker button:active{background:var(--accent-soft);color:var(--accent)}
+.rocker .lbl{
+  text-align:center;font-size:11px;color:var(--muted);padding:4px 0;
+  border-top:1px solid #232c3d;border-bottom:1px solid #232c3d;font-weight:600;
+}
+.mid-mute{display:grid;place-items:center}
+
+.section-title{
+  font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.08em;
+  margin:2px 4px 8px;
+}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chips.wide{grid-template-columns:repeat(3,1fr)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.numpad .num{font-size:19px;font-weight:700;padding:15px 0}
+.numpad .zero{grid-column:2}
+
+/* ---------- settings sheet ---------- */
+.sheet-back{
+  position:fixed;inset:0;background:rgba(4,7,12,.65);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:.25s;z-index:10;
+}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:11;
+  background:#101623;border-top:1px solid var(--line);
+  border-radius:24px 24px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(105%);transition:transform .3s cubic-bezier(.3,.9,.3,1);
+  max-width:480px;margin-inline:auto;max-height:85dvh;overflow:auto;
+}
+body.sheet-open .sheet{transform:translateY(0)}
+body.sheet-open .sheet-back{opacity:1;pointer-events:auto}
+.sheet h2{font-size:16px;margin-bottom:14px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.field input{
+  width:100%;background:#0c1119;border:1px solid var(--line);border-radius:12px;
+  color:var(--text);font:inherit;font-size:14px;padding:11px 12px;direction:ltr;text-align:left;
+}
+.field input:focus{outline:none;border-color:var(--accent)}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:4px}
+.save-btn{
+  width:100%;border:none;border-radius:14px;padding:14px;margin-top:6px;
+  background:var(--accent);color:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer;
+}
+.sheet .divider{height:1px;background:var(--line);margin:16px 0}
+.note{
+  background:var(--accent-soft);border:1px solid var(--accent);
+  border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.8;margin-bottom:12px;
+}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));left:50%;
+  transform:translate(-50%,80px);z-index:20;
+  background:#161d2a;border:1px solid var(--line);color:var(--text);
+  padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;
+  transition:.3s;opacity:0;white-space:nowrap;
+}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.err{border-color:var(--err);color:var(--err)}
+
+.device-panel{display:none;flex-direction:column;gap:14px}
+.device-panel.active{display:flex}
+
+/* ---------- mode switcher ---------- */
+.modes{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+}
+.mode{
+  border:none;border-radius:10px;padding:9px 0;cursor:pointer;
+  background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:13px;transition:.2s;
+}
+.mode.active{background:#1e2636;color:var(--text);box-shadow:inset 0 0 0 1px var(--accent)}
+.mode-view{display:none;flex-direction:column;gap:14px}
+.mode-view.active{display:flex}
+
+/* ---------- simple / kids mode ---------- */
+.simple-grid{display:flex;flex-direction:column;gap:14px}
+.big-btn{
+  border:none;border-radius:26px;cursor:pointer;font:inherit;color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  transition:transform .1s, filter .15s;
+}
+.big-btn:active{transform:scale(.95);filter:brightness(1.12)}
+.big-btn .em{font-size:52px;line-height:1}
+.big-btn .cap{font-size:20px;font-weight:700}
+.big-power{
+  height:210px;background:linear-gradient(160deg,#2ec16b,#1f9a52);
+  box-shadow:0 16px 40px -12px rgba(46,193,107,.6);
+}
+.big-vol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.big-vol .big-btn{height:150px;background:linear-gradient(160deg,#2f8bff,#1e64c8);
+  box-shadow:0 14px 34px -14px rgba(47,139,255,.6)}
+.big-btn.big-home{height:96px;background:linear-gradient(160deg,#3a4356,#2a3243);
+  box-shadow:none;border:1px solid var(--line)}
+.big-btn.big-home .em{font-size:34px}
+.big-btn.big-home .cap{font-size:17px}
+
+/* ---------- scheduler ---------- */
+.sel, .num{
+  width:100%;background:#0c1119;border:1px solid var(--line);border-radius:12px;
+  color:var(--text);font:inherit;font-size:15px;padding:12px;
+}
+.sel:focus,.num:focus{outline:none;border-color:var(--accent)}
+.fld{margin-bottom:12px}
+.fld > span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:12px}
+.seg button{border:none;border-radius:8px;padding:10px 0;cursor:pointer;
+  background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:13px}
+.seg button.on{background:var(--accent);color:#fff}
+.sched-status{
+  text-align:center;padding:14px;border-radius:16px;border:1px dashed var(--line);
+  color:var(--muted);font-size:14px;font-weight:600;margin-top:2px;
+}
+.sched-status.live{border-style:solid;border-color:var(--accent);color:var(--text)}
+.count{font-size:34px;font-weight:700;color:var(--accent);display:block;margin-top:4px;font-variant-numeric:tabular-nums}
+.run-btn{width:100%;border:none;border-radius:16px;padding:16px;cursor:pointer;
+  font:inherit;font-weight:700;font-size:16px;color:#fff;background:var(--accent);
+  box-shadow:0 10px 26px var(--accent-glow);transition:.15s}
+.run-btn:active{transform:scale(.97)}
+.run-btn.stop{background:#c0392b;box-shadow:0 10px 26px rgba(192,57,43,.4)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body data-device="sony">
+
+<div class="remote">
+
+  <header>
+    <div class="brand">الريموت<small id="subTitle">Sony BRAVIA · تحكم عبر الشبكة</small></div>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="openSettings" title="الإعدادات">⚙</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="sony">Sony</button>
+    <button class="tab" data-tab="xiaomi">Xiaomi</button>
+  </div>
+
+  <div class="modes">
+    <button class="mode active" data-mode="full">كامل</button>
+    <button class="mode" data-mode="simple">مبسّط</button>
+    <button class="mode" data-mode="auto">تلقائي</button>
+  </div>
+
+  <!-- ================= MODE: FULL ================= -->
+  <div class="mode-view active" id="view-full">
+
+  <!-- ================= SONY ================= -->
+  <div class="device-panel active" id="panel-sony">
+    <div class="card">
+      <button class="power" onclick="sony('AAAAAQAAAAEAAAAVAw==','تشغيل / إطفاء')">⏻</button>
+
+      <div class="dpad-wrap">
+        <div class="dpad">
+          <button class="dir up"    onclick="sony('AAAAAQAAAAEAAAB0Aw==','أعلى')">▲</button>
+          <button class="dir down"  onclick="sony('AAAAAQAAAAEAAAB1Aw==','أسفل')">▼</button>
+          <button class="dir left"  onclick="sony('AAAAAQAAAAEAAAA0Aw==','يسار')">◀</button>
+          <button class="dir right" onclick="sony('AAAAAQAAAAEAAAAzAw==','يمين')">▶</button>
+          <button class="okbtn"     onclick="sony('AAAAAQAAAAEAAABlAw==','موافق')">OK</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <button class="key" onclick="sony('AAAAAgAAAJcAAAAjAw==','رجوع')"><span class="glyph">↩</span>رجوع</button>
+        <button class="key" onclick="sony('AAAAAQAAAAEAAABgAw==','الرئيسية')"><span class="glyph">⌂</span>الرئيسية</button>
+        <button class="key" onclick="sony('AAAAAgAAAJcAAAA2Aw==','الخيارات')"><span class="glyph">☰</span>خيارات</button>
+      </div>
+
+      <div class="rockers">
+        <div class="rocker">
+          <button onclick="sony('AAAAAQAAAAEAAAASAw==','رفع الصوت')">＋</button>
+          <div class="lbl">الصوت</div>
+          <button onclick="sony('AAAAAQAAAAEAAAATAw==','خفض الصوت')">－</button>
+        </div>
+        <div class="rocker mid-mute">
+          <button style="height:100%" onclick="sony('AAAAAQAAAAEAAAAUAw==','كتم')">🔇</button>
+        </div>
+        <div class="rocker">
+          <button onclick="sony('AAAAAQAAAAEAAAAQAw==','قناة +')">＋</button>
+          <div class="lbl">القنوات</div>
+          <button onclick="sony('AAAAAQAAAAEAAAARAw==','قناة −')">－</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">المداخل والتطبيقات</div>
+      <div class="chips" style="margin-bottom:8px">
+        <button class="key small" onclick="sony('AAAAAgAAABoAAABaAw==','HDMI 1')">HDMI 1</button>
+        <button class="key small" onclick="sony('AAAAAgAAABoAAABbAw==','HDMI 2')">HDMI 2</button>
+        <button class="key small" onclick="sony('AAAAAgAAABoAAABcAw==','HDMI 3')">HDMI 3</button>
+        <button class="key small" onclick="sony('AAAAAgAAABoAAABdAw==','HDMI 4')">HDMI 4</button>
+      </div>
+      <div class="chips wide">
+        <button class="key small" onclick="sony('AAAAAQAAAAEAAAAlAw==','المدخل')">مصدر الدخل</button>
+        <button class="key small" onclick="sony('AAAAAgAAABoAAAB8Aw==','Netflix')">Netflix</button>
+        <button class="key small" onclick="sony('AAAAAgAAAJcAAAAZAw==','إيقاف مؤقت')">⏯ تشغيل/إيقاف</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">الأرقام</div>
+      <div class="numpad">
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAAAw==','1')">1</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAABAw==','2')">2</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAACAw==','3')">3</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAADAw==','4')">4</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAEAw==','5')">5</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAFAw==','6')">6</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAGAw==','7')">7</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAHAw==','8')">8</button>
+        <button class="key num" onclick="sony('AAAAAQAAAAEAAAAIAw==','9')">9</button>
+        <button class="key num zero" onclick="sony('AAAAAQAAAAEAAAAJAw==','0')">0</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= XIAOMI ================= -->
+  <div class="device-panel" id="panel-xiaomi">
+    <div class="card">
+      <button class="power" onclick="mi('power','تشغيل / إطفاء')">⏻</button>
+
+      <div class="dpad-wrap">
+        <div class="dpad">
+          <button class="dir up"    onclick="mi('up','أعلى')">▲</button>
+          <button class="dir down"  onclick="mi('down','أسفل')">▼</button>
+          <button class="dir left"  onclick="mi('left','يسار')">◀</button>
+          <button class="dir right" onclick="mi('right','يمين')">▶</button>
+          <button class="okbtn"     onclick="mi('enter','موافق')">OK</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <button class="key" onclick="mi('back','رجوع')"><span class="glyph">↩</span>رجوع</button>
+        <button class="key" onclick="mi('home','الرئيسية')"><span class="glyph">⌂</span>الرئيسية</button>
+        <button class="key" onclick="mi('menu','القائمة')"><span class="glyph">☰</span>القائمة</button>
+      </div>
+
+      <div class="rockers" style="grid-template-columns:1fr 1fr">
+        <div class="rocker">
+          <button onclick="mi('volumeup','رفع الصوت')">＋</button>
+          <div class="lbl">الصوت</div>
+          <button onclick="mi('volumedown','خفض الصوت')">－</button>
+        </div>
+        <div class="rocker mid-mute">
+          <button style="height:100%" onclick="mi('power','⏻ مطوّل')" ondblclick="">⏻</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">الأرقام</div>
+      <div class="numpad">
+        <button class="key num" onclick="mi('1','1')">1</button>
+        <button class="key num" onclick="mi('2','2')">2</button>
+        <button class="key num" onclick="mi('3','3')">3</button>
+        <button class="key num" onclick="mi('4','4')">4</button>
+        <button class="key num" onclick="mi('5','5')">5</button>
+        <button class="key num" onclick="mi('6','6')">6</button>
+        <button class="key num" onclick="mi('7','7')">7</button>
+        <button class="key num" onclick="mi('8','8')">8</button>
+        <button class="key num" onclick="mi('9','9')">9</button>
+        <button class="key num zero" onclick="mi('0','0')">0</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /view-full -->
+
+  <!-- ================= MODE: SIMPLE ================= -->
+  <div class="mode-view" id="view-simple">
+    <div class="card">
+      <div class="simple-grid">
+        <button class="big-btn big-power" onclick="send('power','تشغيل / إطفاء')">
+          <span class="em">⏻</span><span class="cap">تشغيل / إطفاء</span>
+        </button>
+        <div class="big-vol">
+          <button class="big-btn" onclick="send('voldown','خفض الصوت')">
+            <span class="em">－</span><span class="cap">أخفض</span>
+          </button>
+          <button class="big-btn" onclick="send('volup','رفع الصوت')">
+            <span class="em">＋</span><span class="cap">أعلى</span>
+          </button>
+        </div>
+        <button class="big-btn big-home" onclick="send('home','الرئيسية')">
+          <span class="em">⌂</span><span class="cap">الشاشة الرئيسية</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODE: AUTO (scheduler) ================= -->
+  <div class="mode-view" id="view-auto">
+    <div class="card">
+      <div class="section-title">أمر مجدول تلقائي</div>
+
+      <div class="fld">
+        <span>العملية المطلوبة</span>
+        <select class="sel" id="schAction"></select>
+      </div>
+
+      <div class="fld">
+        <span>التوقيت</span>
+        <div class="seg" id="schMode">
+          <button data-m="repeat" class="on">يتكرر كل</button>
+          <button data-m="once">مرة واحدة بعد</button>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="fld">
+          <span>المقدار</span>
+          <input class="num" id="schEvery" type="number" min="1" value="1" inputmode="numeric">
+        </div>
+        <div class="fld">
+          <span>الوحدة</span>
+          <select class="sel" id="schUnit">
+            <option value="s">ثانية</option>
+            <option value="m" selected>دقيقة</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="run-btn" id="schRun">تشغيل الجدولة</button>
+
+      <div class="sched-status" id="schStatus">
+        الجدولة متوقفة
+      </div>
+      <div class="hint" style="margin-top:10px">
+        الجدولة تعمل ما دامت هذه الصفحة مفتوحة والجهاز غير مقفل. لو تبيها تشتغل حتى والجوال مطفأ، تحتاج تشغيلها من الوسيط على الماك — قلّي وأجهّزها لك.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= SETTINGS ================= -->
+<div class="sheet-back" id="sheetBack"></div>
+<div class="sheet" id="sheet">
+  <h2>الإعدادات</h2>
+
+  <div class="note">
+    الاكتشاف التلقائي يحتاج تشغيل ملف <b>sony-proxy.py</b> على الماك أولاً، ثم ضع عنوانه في خانة «الوسيط» بالأسفل. الطريقة الأضمن دائماً: خذ الـ IP من شاشة إعدادات الشبكة في التلفزيون نفسه.
+  </div>
+  <button class="save-btn" id="discoverBtn" style="background:#1a2130;border:1px solid var(--line);margin-bottom:16px">🔍 اكتشاف الأجهزة تلقائياً</button>
+
+  <div class="field">
+    <label>Sony — عنوان IP</label>
+    <input id="sonyIp" placeholder="10.x.x.x" inputmode="decimal">
+  </div>
+  <div class="field">
+    <label>Sony — الرمز المشترك (Pre-Shared Key)</label>
+    <input id="sonyPsk" placeholder="0000">
+    <div class="hint">من التلفزيون: Settings ← Network ← Home Network ← IP Control ← فعّل Authentication بنمط Pre-Shared Key وحدد الرمز، وفعّل Remote Start.</div>
+  </div>
+  <div class="field">
+    <label>Sony — عنوان الوسيط Proxy (اختياري)</label>
+    <input id="sonyProxy" placeholder="http://192.168.x.x:8765">
+    <div class="hint">بعض المتصفحات تمنع إرسال أوامر Sony مباشرة (قيود CORS). إذا ما اشتغل الوضع المباشر، شغّل ملف <b>sony-proxy.py</b> المرفق على الماك بأمر واحد واكتب عنوانه هنا.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="field">
+    <label>Xiaomi — عنوان IP</label>
+    <input id="miIp" placeholder="10.x.x.x" inputmode="decimal">
+  </div>
+  <div class="field">
+    <label>Xiaomi — المنفذ</label>
+    <input id="miPort" placeholder="6095" inputmode="numeric">
+    <div class="hint">أوامر Xiaomi تنرسل مباشرة على المنفذ 6095. إذا ما استجاب الجهاز، فالأغلب أن تحديثات النظام الجديدة أقفلت هذا المنفذ.</div>
+  </div>
+
+  <button class="save-btn" id="saveBtn">حفظ الإعدادات</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- state ---------------- */
+const $ = s => document.querySelector(s);
+const cfg = JSON.parse(localStorage.getItem('tvRemoteCfg') || '{}');
+const defaults = { sonyIp:'', sonyPsk:'0000', sonyProxy:'', miIp:'', miPort:'6095' };
+Object.keys(defaults).forEach(k => { if(cfg[k] === undefined) cfg[k] = defaults[k]; });
+
+function loadForm(){
+  ['sonyIp','sonyPsk','sonyProxy','miIp','miPort'].forEach(k => $('#'+k).value = cfg[k]);
+}
+loadForm();
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const dev = t.dataset.tab;
+    document.body.dataset.device = dev;
+    document.querySelectorAll('.device-panel').forEach(p=>p.classList.remove('active'));
+    $('#panel-'+dev).classList.add('active');
+    $('#subTitle').textContent = dev==='sony' ? 'Sony BRAVIA · تحكم عبر الشبكة' : 'Xiaomi · تحكم عبر الشبكة';
+    buzz(8);
+  });
+});
+
+/* ---------------- mode switcher ---------------- */
+document.querySelectorAll('.mode').forEach(m=>{
+  m.addEventListener('click', ()=>{
+    document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));
+    m.classList.add('active');
+    const mode = m.dataset.mode;
+    document.querySelectorAll('.mode-view').forEach(v=>v.classList.remove('active'));
+    $('#view-'+mode).classList.add('active');
+    buzz(8);
+  });
+});
+
+/* ---------------- shared action map + dispatcher ---------------- */
+const ACTIONS = {
+  power:  {label:'تشغيل / إطفاء', sony:'AAAAAQAAAAEAAAAVAw==', mi:'power'},
+  volup:  {label:'رفع الصوت',     sony:'AAAAAQAAAAEAAAASAw==', mi:'volumeup'},
+  voldown:{label:'خفض الصوت',     sony:'AAAAAQAAAAEAAAATAw==', mi:'volumedown'},
+  mute:   {label:'كتم الصوت',     sony:'AAAAAQAAAAEAAAAUAw==', mi:'volumedown'},
+  home:   {label:'الشاشة الرئيسية',sony:'AAAAAQAAAAEAAABgAw==', mi:'home'},
+  back:   {label:'رجوع',          sony:'AAAAAgAAAJcAAAAjAw==', mi:'back'},
+  up:     {label:'أعلى',          sony:'AAAAAQAAAAEAAAB0Aw==', mi:'up'},
+  down:   {label:'أسفل',          sony:'AAAAAQAAAAEAAAB1Aw==', mi:'down'},
+  left:   {label:'يسار',          sony:'AAAAAQAAAAEAAAA0Aw==', mi:'left'},
+  right:  {label:'يمين',          sony:'AAAAAQAAAAEAAAAzAw==', mi:'right'},
+  ok:     {label:'موافق',         sony:'AAAAAQAAAAEAAABlAw==', mi:'enter'},
+};
+function send(actionKey, label){
+  const a = ACTIONS[actionKey];
+  if(!a) return;
+  if(document.body.dataset.device === 'sony') sony(a.sony, label || a.label);
+  else mi(a.mi, label || a.label);
+}
+
+/* ---------------- scheduler ---------------- */
+(function initSched(){
+  const selAction = $('#schAction');
+  Object.keys(ACTIONS).forEach(k=>{
+    const o = document.createElement('option');
+    o.value = k; o.textContent = ACTIONS[k].label;
+    selAction.appendChild(o);
+  });
+  selAction.value = 'power';
+})();
+
+let schMode = 'repeat';
+document.querySelectorAll('#schMode button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(schTimer) return; // لا تغيّر أثناء التشغيل
+    document.querySelectorAll('#schMode button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); schMode = b.dataset.m;
+  });
+});
+
+let schTimer=null, schTick=null, schReset=0, schLeft=0;
+function fmt(s){ const m=Math.floor(s/60), r=s%60; return m>0 ? m+':'+String(r).padStart(2,'0') : r+'ث'; }
+function paintCountdown(){
+  const st = $('#schStatus');
+  st.classList.add('live');
+  st.innerHTML = (schMode==='repeat' ? 'التنفيذ التالي بعد' : 'ينفّذ بعد') +
+                 '<span class="count">'+fmt(schLeft)+'</span>' +
+                 ACTIONS[$('#schAction').value].label;
+}
+function stopSchedule(){
+  clearInterval(schTimer); clearTimeout(schTimer); clearInterval(schTick);
+  schTimer=null; schTick=null;
+  const btn=$('#schRun'); btn.textContent='تشغيل الجدولة'; btn.classList.remove('stop');
+  const st=$('#schStatus'); st.classList.remove('live'); st.textContent='الجدولة متوقفة';
+}
+function startSchedule(){
+  const act = $('#schAction').value;
+  const n = parseInt($('#schEvery').value,10) || 0;
+  const secs = ($('#schUnit').value==='m') ? n*60 : n;
+  if(secs < 1){ toast('حدد وقتاً صحيحاً','err'); return; }
+
+  schReset = secs; schLeft = secs; paintCountdown();
+  schTick = setInterval(()=>{
+    schLeft--; if(schLeft < 0) schLeft = schReset; paintCountdown();
+  }, 1000);
+
+  const fire = ()=>{ send(act, ACTIONS[act].label + ' (تلقائي)'); schLeft = schReset; };
+
+  if(schMode === 'repeat'){
+    schTimer = setInterval(fire, secs*1000);
+  }else{
+    schTimer = setTimeout(()=>{ fire(); stopSchedule(); toast('نُفّذ الأمر المجدول','ok'); }, secs*1000);
+  }
+  const btn=$('#schRun'); btn.textContent='إيقاف الجدولة'; btn.classList.add('stop');
+}
+$('#schRun').onclick = ()=> schTimer ? stopSchedule() : startSchedule();
+
+/* ---------------- settings sheet ---------------- */
+$('#openSettings').onclick = ()=> document.body.classList.add('sheet-open');
+$('#sheetBack').onclick    = ()=> document.body.classList.remove('sheet-open');
+$('#discoverBtn').onclick = async ()=>{
+  const proxy = $('#sonyProxy').value.trim();
+  if(!proxy){ toast('أدخل عنوان الوسيط أولاً ثم شغّل السكربت','err'); return; }
+  const btn = $('#discoverBtn');
+  const original = btn.textContent;
+  btn.textContent = '⏳ جاري الفحص...'; btn.disabled = true;
+  try{
+    const r = await fetch(proxy.replace(/\/+$/,'') + '/discover');
+    const d = await r.json();
+    if(d.sony && d.sony[0])   $('#sonyIp').value = d.sony[0];
+    if(d.xiaomi && d.xiaomi[0]) $('#miIp').value = d.xiaomi[0];
+    const found = [];
+    if(d.sony && d.sony.length)   found.push('Sony: '+d.sony.join(', '));
+    if(d.xiaomi && d.xiaomi.length) found.push('Xiaomi: '+d.xiaomi.join(', '));
+    toast(found.length ? ('عُثر على — '+found.join(' · ')) : 'لم يُعثر على تلفزيونات', found.length?'ok':'err');
+  }catch(e){
+    toast('تعذر الوصول للوسيط — تأكد أن السكربت شغّال','err');
+  }finally{
+    btn.textContent = original; btn.disabled = false;
+  }
+};
+
+$('#saveBtn').onclick = ()=>{
+  ['sonyIp','sonyPsk','sonyProxy','miIp','miPort'].forEach(k => cfg[k] = $('#'+k).value.trim());
+  localStorage.setItem('tvRemoteCfg', JSON.stringify(cfg));
+  document.body.classList.remove('sheet-open');
+  toast('تم حفظ الإعدادات','ok');
+};
+
+/* ---------------- feedback ---------------- */
+let toastTimer;
+function toast(msg, type=''){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 1600);
+}
+function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+
+/* ---------------- Sony (IRCC over IP) ---------------- */
+function soap(code){
+  return '<?xml version="1.0"?>'+
+  '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'+
+  '<s:Body><u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">'+
+  '<IRCCCode>'+code+'</IRCCCode>'+
+  '</u:X_SendIRCC></s:Body></s:Envelope>';
+}
+
+async function sony(code, label){
+  buzz(12);
+  if(!cfg.sonyIp){ toast('أدخل عنوان IP للتلفزيون من الإعدادات ⚙','err'); return; }
+
+  // via proxy (reliable)
+  if(cfg.sonyProxy){
+    try{
+      const r = await fetch(cfg.sonyProxy.replace(/\/+$/,'') + '/ircc', {
+        method:'POST',
+        headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({ ip: cfg.sonyIp, psk: cfg.sonyPsk, code })
+      });
+      if(r.ok){ toast(label + ' ✓','ok'); } else { toast('التلفزيون رفض الأمر — تأكد من الرمز PSK','err'); }
+    }catch(e){ toast('تعذر الوصول للوسيط Proxy','err'); }
+    return;
+  }
+
+  // direct attempt (may be blocked by browser CORS policy)
+  try{
+    await fetch('http://'+cfg.sonyIp+'/sony/ircc', {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: soap(code)
+    });
+    toast(label + ' — أُرسل مباشرة');
+  }catch(e){
+    toast('المتصفح منع الإرسال المباشر — استخدم الوسيط','err');
+  }
+}
+
+/* ---------------- Xiaomi (port 6095) ---------------- */
+function mi(key, label){
+  buzz(12);
+  if(!cfg.miIp){ toast('أدخل عنوان IP لجهاز شاومي من الإعدادات ⚙','err'); return; }
+  const url = 'http://'+cfg.miIp+':'+(cfg.miPort||'6095')+'/controller?action=keyevent&keycode='+key;
+  fetch(url, { mode:'no-cors' })
+    .then(()=> toast(label + ' ✓','ok'))
+    .catch(()=> toast('تعذر الوصول للجهاز — تأكد من الشبكة والمنفذ','err'));
+}
+</script>
+</body>
+</html>
